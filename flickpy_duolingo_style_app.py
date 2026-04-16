@@ -1,20 +1,26 @@
+# ==============================
+# FLICKPY - VERSION PRO ESTABLE
+# ==============================
+
 import streamlit as st
 import json
 import os
 import hashlib
 import random
-from datetime import date, datetime
+from datetime import date
 
 APP_TITLE = "FlickPy"
 USERS_FILE = "flickpy_users.json"
 INVITE_CODES = ["FLICK2026", "PYTHONCLASS", "INVITEFlickPy"]
-ADMIN_USER = "admin"
-ADMIN_PASS_HASH = hashlib.sha256("admin123".encode("utf-8")).hexdigest()
 
-LESSONS = [
+# ==============================
+# BASE DE LECCIONES + 40 EXTRA
+# ==============================
+
+BASE_LESSONS = [
     {
-        "id": "intro_vars",
-        "title": "Variables",
+        "id": "vars_01",
+        "title": "Variables 1",
         "icon": "🟢",
         "xp": 15,
         "difficulty": "Fácil",
@@ -25,105 +31,100 @@ LESSONS = [
                 "prompt": "¿Qué tipo de dato guarda texto?",
                 "options": ["str", "int", "bool"],
                 "answer": "str",
-                "explanation": "str representa texto en Python.",
+                "explanation": "str representa texto.",
             },
             {
                 "type": "fill",
                 "prompt": "Completa la variable",
                 "starter": "_____ = 'Flick'",
                 "answer": "nombre",
-                "explanation": "Un ejemplo correcto es nombre = 'Flick'.",
+                "explanation": "Un ejemplo válido es nombre = 'Flick'.",
             },
         ],
     },
     {
-        "id": "cond_if",
-        "title": "Condicionales",
+        "id": "if_01",
+        "title": "Condicionales 1",
         "icon": "🟡",
-        "xp": 20,
+        "xp": 18,
         "difficulty": "Fácil",
-        "theory": "if, elif y else permiten tomar decisiones según una condición.",
+        "theory": "if y else permiten tomar decisiones.",
         "questions": [
             {
                 "type": "mc",
-                "prompt": "¿Qué palabra se usa para una ruta alternativa?",
+                "prompt": "¿Qué palabra marca la ruta alternativa?",
                 "options": ["then", "else", "switch"],
                 "answer": "else",
-                "explanation": "else ejecuta otra ruta cuando la condición no se cumple.",
+                "explanation": "else ejecuta otra ruta.",
             },
             {
                 "type": "fill",
-                "prompt": "Completa la palabra clave",
-                "starter": "if x > 5:
-    print('ok')
-_____: 
-    print('no')",
+                "prompt": "Completa la estructura",
+                "starter": "if x > 5:\n    print('ok')\n_____: \n    print('no')",
                 "answer": "else",
                 "explanation": "La opción correcta es else.",
             },
         ],
     },
     {
-        "id": "loops_for",
-        "title": "Bucles",
+        "id": "for_01",
+        "title": "Bucles 1",
         "icon": "🔵",
-        "xp": 25,
-        "difficulty": "Media",
-        "theory": "for repite acciones sobre secuencias. range(3) produce 0, 1, 2.",
+        "xp": 20,
+        "difficulty": "Fácil",
+        "theory": "for repite acciones sobre secuencias.",
         "questions": [
             {
                 "type": "mc",
                 "prompt": "¿Qué genera range(3)?",
                 "options": ["1,2,3", "0,1,2", "0,1,2,3"],
                 "answer": "0,1,2",
-                "explanation": "range empieza en 0 y termina antes del número indicado.",
+                "explanation": "range empieza en 0 y termina antes del 3.",
             },
             {
                 "type": "fill",
                 "prompt": "Completa la función",
-                "starter": "for i in _____(5):
-    print(i)",
+                "starter": "for i in _____(5):\n    print(i)",
                 "answer": "range",
-                "explanation": "range(5) repite 5 veces: 0,1,2,3,4.",
+                "explanation": "range(5) produce 0,1,2,3,4.",
             },
         ],
     },
     {
-        "id": "funcs",
-        "title": "Funciones",
+        "id": "func_01",
+        "title": "Funciones 1",
         "icon": "🟣",
-        "xp": 30,
+        "xp": 22,
         "difficulty": "Media",
-        "theory": "Una función se define con def y puede devolver valores con return.",
+        "theory": "Las funciones se crean con def y pueden devolver valores con return.",
         "questions": [
             {
                 "type": "mc",
                 "prompt": "¿Qué palabra define una función?",
                 "options": ["func", "def", "return"],
                 "answer": "def",
-                "explanation": "def crea una función en Python.",
+                "explanation": "def crea una función.",
             },
             {
                 "type": "fill",
                 "prompt": "Completa la palabra clave",
-                "starter": "def sumar(a, b):
-    _____ a + b",
+                "starter": "def sumar(a, b):\n    _____ a + b",
                 "answer": "return",
                 "explanation": "return devuelve el resultado.",
             },
         ],
     },
     {
-        "id": "lists",
-        "title": "Listas",
+        "id": "list_01",
+        "title": "Listas 1",
         "icon": "🟠",
-        "xp": 35,
+        "xp": 24,
         "difficulty": "Media",
-        "theory": "Las listas almacenan varios elementos en orden. Ejemplo: frutas = ['manzana', 'pera']",
+        "theory": "Las listas almacenan varios elementos en orden.",
         "questions": [
             {
                 "type": "mc",
-                "prompt": "¿Con qué símbolo se crea una lista?",
+                "prompt": "¿Qué símbolo usa una lista?",
                 "options": ["()", "[]", "{}"],
                 "answer": "[]",
                 "explanation": "Las listas usan corchetes.",
@@ -131,26 +132,163 @@ _____:
             {
                 "type": "fill",
                 "prompt": "Completa el método",
-                "starter": "numeros = [1, 2]
-numeros._____(3)",
+                "starter": "numeros = [1, 2]\nnumeros._____(3)",
                 "answer": "append",
-                "explanation": "append agrega un elemento al final de la lista.",
+                "explanation": "append agrega un elemento.",
             },
         ],
     },
 ]
 
-ACHIEVEMENTS = [
-    ("start", "Primer login", lambda u: True),
-    ("xp50", "50 XP", lambda u: u.get("xp", 0) >= 50),
-    ("xp100", "100 XP", lambda u: u.get("xp", 0) >= 100),
-    ("streak3", "Racha x3", lambda u: u.get("streak", 0) >= 3),
-    ("all_lessons", "Ruta completa", lambda u: len(u.get("completed_lessons", [])) >= len(LESSONS)),
+EXTRA_LESSON_SPECS = [
+    ("Strings", "🔤", "Media", 26, "Los strings son texto y tienen métodos útiles.", [
+        ("mc", "¿Qué método convierte a mayúsculas?", ["upper", "split", "append"], "upper", "upper convierte el texto a mayúsculas.", None),
+        ("fill", "Completa el método", None, "lower", "lower pasa el texto a minúsculas.", "texto = 'HOLA'\ntexto._____()"),
+    ]),
+    ("Print e input", "⌨️", "Fácil", 18, "print muestra texto y input recibe datos del usuario.", [
+        ("mc", "¿Qué función muestra texto en pantalla?", ["input", "print", "len"], "print", "print muestra texto.", None),
+        ("fill", "Completa la función", None, "input", "input permite escribir datos.", "nombre = _____('Tu nombre: ')"),
+    ]),
+    ("While", "🔁", "Media", 28, "while repite mientras una condición sea verdadera.", [
+        ("mc", "¿Cuál palabra crea un bucle condicional?", ["for", "loop", "while"], "while", "while repite según una condición.", None),
+        ("fill", "Completa la palabra", None, "while", "Se usa while.", "_____ x < 5:\n    x += 1"),
+    ]),
+    ("Booleanos", "⚪", "Fácil", 16, "Los booleanos representan verdadero o falso.", [
+        ("mc", "¿Cuál es un valor booleano?", ["True", "'True'", "1"], "True", "True es booleano real.", None),
+        ("fill", "Completa el valor", None, "False", "False también es booleano.", "activo = _____"),
+    ]),
+    ("Comparaciones", "⚖️", "Fácil", 18, "Comparar permite evaluar igualdad o diferencia.", [
+        ("mc", "¿Qué operador significa igual a?", ["=", "==", "!="], "==", "== compara igualdad.", None),
+        ("fill", "Completa el operador", None, ">", "> significa mayor que.", "print(5 _____ 3)"),
+    ]),
+    ("Operadores lógicos", "🧠", "Media", 24, "and, or y not combinan condiciones.", [
+        ("mc", "¿Qué operador exige que ambas condiciones sean verdaderas?", ["or", "and", "not"], "and", "and requiere ambas verdaderas.", None),
+        ("fill", "Completa la palabra", None, "not", "not invierte una condición.", "print(_____ True)"),
+    ]),
+    ("Tuplas", "📦", "Media", 25, "Las tuplas son similares a listas pero inmutables.", [
+        ("mc", "¿Qué símbolo usa una tupla?", ["[]", "()", "{}"], "()", "Las tuplas usan paréntesis.", None),
+        ("fill", "Completa la estructura", None, "(", "Una tupla empieza con paréntesis.", "datos = _____1, 2, 3)"),
+    ]),
+    ("Sets", "🧩", "Media", 27, "Los sets no guardan duplicados.", [
+        ("mc", "¿Qué colección evita duplicados?", ["list", "set", "tuple"], "set", "set no guarda repetidos.", None),
+        ("fill", "Completa la palabra", None, "set", "set crea un conjunto.", "numeros = _____([1,1,2])"),
+    ]),
+    ("Diccionarios", "📘", "Media", 30, "Los diccionarios guardan clave y valor.", [
+        ("mc", "¿Qué símbolo usa un diccionario?", ["[]", "{}", "()"], "{}", "Los diccionarios usan llaves.", None),
+        ("fill", "Completa el método", None, "get", "get obtiene un valor por clave.", "persona = {'nombre': 'Ana'}\npersona._____('nombre')"),
+    ]),
+    ("Métodos de lista", "📋", "Media", 30, "Las listas tienen métodos como append y pop.", [
+        ("mc", "¿Qué método agrega un elemento?", ["push", "append", "add"], "append", "append agrega al final.", None),
+        ("fill", "Completa el método", None, "pop", "pop elimina un elemento.", "datos = [1,2,3]\ndatos._____()"),
+    ]),
+    ("Slicing", "✂️", "Media", 32, "El slicing toma porciones de una secuencia.", [
+        ("mc", "¿Qué obtiene texto[0:2]?", ["primer carácter", "dos primeros caracteres", "todo el texto"], "dos primeros caracteres", "0:2 toma desde 0 hasta antes de 2.", None),
+        ("fill", "Completa el ejemplo", None, ":", "El slicing usa dos puntos.", "sub = texto[0____2]"),
+    ]),
+    ("Enumerate", "🔢", "Media", 32, "enumerate permite recorrer índice y valor.", [
+        ("mc", "¿Qué función da índice y valor?", ["range", "enumerate", "zip"], "enumerate", "enumerate da índice y valor.", None),
+        ("fill", "Completa la función", None, "enumerate", "Se usa enumerate.", "for i, valor in _____(lista):\n    print(i, valor)"),
+    ]),
+    ("Zip", "🪢", "Media", 34, "zip combina elementos de varias secuencias.", [
+        ("mc", "¿Qué función combina listas en pares?", ["zip", "join", "merge"], "zip", "zip combina secuencias.", None),
+        ("fill", "Completa la función", None, "zip", "zip une elementos por posición.", "pares = _____(nombres, edades)"),
+    ]),
+    ("Funciones 2", "🛠️", "Media", 34, "Las funciones pueden recibir parámetros y reutilizar lógica.", [
+        ("mc", "¿Cómo se llaman los valores que recibe una función?", ["métodos", "parámetros", "índices"], "parámetros", "Se llaman parámetros.", None),
+        ("fill", "Completa la palabra", None, "def", "def define la función.", "_____ saludar(nombre):\n    print(nombre)"),
+    ]),
+    ("Return", "↩️", "Media", 34, "return devuelve un resultado desde una función.", [
+        ("mc", "¿Qué palabra devuelve un valor?", ["print", "return", "yield"], "return", "return devuelve el resultado.", None),
+        ("fill", "Completa la palabra", None, "return", "return envía el valor hacia afuera.", "def doble(x):\n    _____ x * 2"),
+    ]),
+    ("Scope", "🌐", "Difícil", 36, "El scope define dónde existe una variable.", [
+        ("mc", "¿Dónde vive una variable creada dentro de una función?", ["scope global", "scope local", "archivo entero"], "scope local", "Dentro de funciones suele ser local.", None),
+        ("fill", "Completa la palabra", None, "global", "global permite referirse a una variable global.", "_____ puntos"),
+    ]),
+    ("Try Except", "🛡️", "Media", 36, "try y except permiten manejar errores.", [
+        ("mc", "¿Qué bloque captura un error?", ["except", "error", "raise"], "except", "except captura excepciones.", None),
+        ("fill", "Completa la palabra", None, "try", "Se usa try para envolver el riesgo.", "_____:\n    x = 1 / 0"),
+    ]),
+    ("Archivos", "📂", "Media", 38, "open permite leer y escribir archivos.", [
+        ("mc", "¿Qué función abre un archivo?", ["file", "open", "read"], "open", "open abre archivos.", None),
+        ("fill", "Completa el modo", None, "r", "r sirve para leer.", "archivo = open('datos.txt', '_____')"),
+    ]),
+    ("Clases", "🏛️", "Difícil", 42, "Las clases permiten crear objetos y agrupar comportamiento.", [
+        ("mc", "¿Qué palabra define una clase?", ["class", "def", "object"], "class", "class define una clase.", None),
+        ("fill", "Completa la palabra", None, "class", "Se usa class.", "_____ Persona:\n    pass"),
+    ]),
+    ("Objetos", "🧱", "Difícil", 42, "Un objeto es una instancia de una clase.", [
+        ("mc", "¿Qué es p = Persona()?", ["una clase", "una instancia", "un módulo"], "una instancia", "Es un objeto creado desde la clase.", None),
+        ("fill", "Completa el método especial", None, "__init__", "__init__ inicializa atributos.", "def _____(self, nombre):\n    self.nombre = nombre"),
+    ]),
 ]
+
+
+def build_extra_lessons():
+    lessons = []
+    for idx in range(40):
+        name, icon, difficulty, xp, theory, qspecs = EXTRA_LESSON_SPECS[idx % len(EXTRA_LESSON_SPECS)]
+        lesson_num = idx + 1
+        questions = []
+        for q_index, spec in enumerate(qspecs):
+            q_type, prompt, options, answer, explanation, starter = spec
+            if q_type == "mc":
+                questions.append(
+                    {
+                        "type": "mc",
+                        "prompt": f"{prompt}",
+                        "options": options,
+                        "answer": answer,
+                        "explanation": explanation,
+                    }
+                )
+            else:
+                questions.append(
+                    {
+                        "type": "fill",
+                        "prompt": prompt,
+                        "starter": starter,
+                        "answer": answer,
+                        "explanation": explanation,
+                    }
+                )
+        lessons.append(
+            {
+                "id": f"extra_{lesson_num:02d}",
+                "title": f"{name} {lesson_num}",
+                "icon": icon,
+                "xp": xp + (idx % 4) * 2,
+                "difficulty": difficulty,
+                "theory": theory,
+                "questions": questions,
+            }
+        )
+    return lessons
+
+
+LESSONS = BASE_LESSONS + build_extra_lessons()
+
+# ==============================
+# LOGROS
+# ==============================
+
+ACHIEVEMENTS = [
+    ("first_login", "Primer login", lambda p: True),
+    ("xp_100", "100 XP", lambda p: p.get("xp", 0) >= 100),
+    ("xp_300", "300 XP", lambda p: p.get("xp", 0) >= 300),
+    ("lessons_10", "10 lecciones", lambda p: len(p.get("completed", [])) >= 10),
+    ("lessons_30", "30 lecciones", lambda p: len(p.get("completed", [])) >= 30),
+    ("full_route", "Ruta completa", lambda p: len(p.get("completed", [])) >= len(LESSONS)),
+]
+
+# ==============================
+# UTILIDADES
+# ==============================
 
 
 def hash_pw(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
 
 
 def default_progress(display_name="Estudiante"):
@@ -158,14 +296,17 @@ def default_progress(display_name="Estudiante"):
         "name": display_name,
         "xp": 0,
         "level": 1,
-        "streak": 0,
         "gems": 25,
         "hearts": 5,
-        "completed_lessons": [],
-        "achievements": [],
-        "last_active": "",
+        "streak": 0,
+        "completed": [],
         "history": [],
+        "achievements": [],
+        "infinite_streak": 0,
+        "best_infinite_streak": 0,
+        "last_active": "",
     }
+
 
 
 def load_users():
@@ -178,30 +319,85 @@ def load_users():
         return {}
 
 
+
 def save_users(users):
     with open(USERS_FILE, "w", encoding="utf-8") as f:
         json.dump(users, f, ensure_ascii=False, indent=2)
 
 
-def get_image_path(name):
-    for ext in ["png", "jpg", "jpeg", "webp"]:
-        path = f"{name}.{ext}"
-        if os.path.exists(path):
-            return path
+
+def persist_current_user():
+    if "user" not in st.session_state:
+        return
+    users = load_users()
+    username = st.session_state["user"]
+    if username in users:
+        users[username]["progress"] = st.session_state["progress"]
+        save_users(users)
+
+
+
+def update_meta(progress):
+    progress["level"] = max(1, progress.get("xp", 0) // 80 + 1)
+    today = str(date.today())
+    if progress.get("last_active") != today:
+        progress["streak"] = progress.get("streak", 0) + 1
+        progress["last_active"] = today
+    unlock_achievements(progress)
+    return progress
+
+
+
+def unlock_achievements(progress):
+    unlocked = set(progress.get("achievements", []))
+    for aid, _, rule in ACHIEVEMENTS:
+        if aid not in unlocked and rule(progress):
+            progress.setdefault("achievements", []).append(aid)
+
+
+
+def lesson_completed(progress, lesson_id):
+    return lesson_id in progress.get("completed", [])
+
+
+
+def next_lesson_id(progress):
+    for lesson in LESSONS:
+        if lesson["id"] not in progress.get("completed", []):
+            return lesson["id"]
     return None
 
 
-def render_logo(width=120):
-    logo = get_image_path("logo")
-    if logo:
-        st.image(logo, width=width)
-    else:
-        st.markdown(
-            f"""
-            <div style='width:{width}px;height:{width}px;border-radius:28px;background:radial-gradient(circle at top,#163b8c,#091126 70%);display:flex;align-items:center;justify-content:center;font-size:52px;border:1px solid rgba(100,255,210,0.28);box-shadow:0 0 30px rgba(0,255,170,0.10)'>🐍</div>
-            """,
-            unsafe_allow_html=True,
+
+def is_lesson_locked(progress, lesson_id):
+    nxt = next_lesson_id(progress)
+    if nxt is None:
+        return False
+    return lesson_id != nxt and lesson_id not in progress.get("completed", [])
+
+
+
+def get_leaderboard():
+    users = load_users()
+    rows = []
+    for username, data in users.items():
+        p = data.get("progress", default_progress(data.get("name", username)))
+        rows.append(
+            {
+                "username": username,
+                "name": p.get("name", username),
+                "xp": p.get("xp", 0),
+                "level": p.get("level", 1),
+                "completed": len(p.get("completed", [])),
+                "streak": p.get("streak", 0),
+            }
         )
+    rows.sort(key=lambda x: (x["xp"], x["completed"], x["streak"]), reverse=True)
+    return rows
+
+# ==============================
+# UI
+# ==============================
 
 
 def inject_css():
@@ -210,95 +406,61 @@ def inject_css():
         <style>
         .stApp {
             background:
-                radial-gradient(circle at top left, rgba(0,255,170,0.08), transparent 25%),
-                radial-gradient(circle at top right, rgba(0,153,255,0.08), transparent 25%),
-                linear-gradient(180deg, #050814 0%, #091126 50%, #050814 100%);
+                radial-gradient(circle at top left, rgba(0,255,170,0.08), transparent 20%),
+                radial-gradient(circle at top right, rgba(0,153,255,0.08), transparent 22%),
+                linear-gradient(180deg, #06111f 0%, #0b1730 48%, #08111f 100%);
         }
-        .block-container {
-            padding-top: 1.4rem;
-            padding-bottom: 2rem;
-        }
-        .card {
-            padding: 22px;
+        .block-container {padding-top: 1.2rem; padding-bottom: 2rem; max-width: 1200px;}
+        .glass {
+            padding: 20px;
             border-radius: 22px;
-            background: linear-gradient(180deg, rgba(7,13,28,0.92), rgba(8,18,36,0.86));
-            border: 1px solid rgba(93,255,190,0.16);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+            background: linear-gradient(180deg, rgba(9,18,36,0.96), rgba(10,20,42,0.86));
+            border: 1px solid rgba(90,255,200,0.14);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.30);
         }
         .hero-title {
-            color: #f5fbff;
-            font-size: 2.6rem;
+            color: white;
+            font-size: 2.7rem;
             font-weight: 900;
-            margin-bottom: 0.3rem;
+            line-height: 1.1;
         }
         .hero-sub {
-            color:#bfd0ea;
-            font-size:1.05rem;
-            margin-bottom: 0.8rem;
+            color: #bfd0ea;
+            margin-top: 8px;
+            font-size: 1.02rem;
         }
-        .mini-badge {
+        .pill {
             display:inline-block;
-            padding:8px 12px;
-            border-radius:999px;
-            margin-right:8px;
-            margin-top:8px;
-            background:rgba(17, 30, 56, 0.95);
-            border:1px solid rgba(70, 255, 190, 0.18);
-            color:#d8e6ff;
-            font-size:0.85rem;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(20,31,57,0.96);
+            border: 1px solid rgba(90,255,200,0.16);
+            color: #dff8ff;
+            margin-right: 8px;
+            margin-top: 10px;
+            font-size: 0.83rem;
         }
-        .lesson-tile {
+        .lesson-card {
             padding: 16px;
             border-radius: 20px;
             background: linear-gradient(180deg, rgba(11,22,43,0.95), rgba(8,15,31,0.92));
             border: 1px solid rgba(93,255,190,0.12);
-            text-align: center;
-            min-height: 140px;
-            margin-bottom: 14px;
+            min-height: 150px;
+            margin-bottom: 12px;
         }
-        .lesson-icon {
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-        .lesson-name {
-            color: white;
-            font-weight: 700;
-            font-size: 1rem;
-        }
-        .lesson-meta {
-            color: #aec4e6;
-            font-size: 0.85rem;
-            margin-top: 6px;
-        }
-        .path-node {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:1.7rem;
-            margin: 0 auto 8px auto;
-            background: linear-gradient(180deg, #1ce783, #0f9b58);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-        }
-        .path-node.locked {
-            background: linear-gradient(180deg, #34445d, #202c3c);
-        }
-        .centered-small {
-            text-align:center;
-            color:#c7d7ef;
-            font-size:0.9rem;
-        }
+        .lesson-icon {font-size: 2rem; margin-bottom: 8px;}
+        .lesson-title {color: white; font-size: 1rem; font-weight: 800;}
+        .lesson-meta {color:#aec4e6; font-size:0.85rem; margin-top:6px;}
         .question-card {
             padding: 24px;
             border-radius: 24px;
             background: linear-gradient(180deg, rgba(10,20,38,0.98), rgba(8,15,31,0.94));
             border: 1px solid rgba(93,255,190,0.16);
             box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-            animation: slideUpFade 0.45s ease;
+            animation: slideUpFade 0.38s ease;
             margin-bottom: 16px;
         }
+        .question-title {color:white; font-size:1.35rem; font-weight:800; margin-bottom: 6px;}
         .transition-chip {
             display:inline-block;
             padding:10px 14px;
@@ -307,29 +469,20 @@ def inject_css():
             border:1px solid rgba(28,231,131,0.24);
             color:#dfffee;
             font-weight:700;
-            animation: pulseGlow 0.8s ease-in-out 2;
             margin-bottom: 12px;
         }
-        .question-title {
-            color:white;
-            font-size:1.35rem;
-            font-weight:800;
-            margin-bottom: 8px;
+        .path-node {
+            width: 72px; height: 72px; border-radius: 50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size: 1.7rem; margin: 0 auto 10px auto;
+            background: linear-gradient(180deg, #1ce783, #0f9b58);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
         }
+        .path-node.locked {background: linear-gradient(180deg, #34445d, #202c3c);}
+        .center-small {text-align:center; color:#c7d7ef; font-size:0.9rem;}
         @keyframes slideUpFade {
-            from {
-                opacity: 0;
-                transform: translateY(18px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 0 0 rgba(28,231,131,0); }
-            50% { transform: scale(1.04); box-shadow: 0 0 24px rgba(28,231,131,0.22); }
-            100% { transform: scale(1); box-shadow: 0 0 0 rgba(28,231,131,0); }
+            from {opacity:0; transform: translateY(14px) scale(0.99);} 
+            to {opacity:1; transform: translateY(0) scale(1);} 
         }
         </style>
         """,
@@ -337,236 +490,148 @@ def inject_css():
     )
 
 
-def unlock_achievements(progress):
-    current = set(progress.get("achievements", []))
-    for aid, _, cond in ACHIEVEMENTS:
-        if aid not in current and cond(progress):
-            progress.setdefault("achievements", []).append(aid)
-
-
-def update_meta(progress):
-    today = str(date.today())
-    last = progress.get("last_active", "")
-    if last:
-        try:
-            last_date = datetime.strptime(last, "%Y-%m-%d").date()
-            diff = (date.today() - last_date).days
-            if diff == 1:
-                progress["streak"] += 1
-            elif diff > 1:
-                progress["streak"] = 1
-        except Exception:
-            progress["streak"] = max(1, progress.get("streak", 0))
-    else:
-        progress["streak"] = 1
-    progress["last_active"] = today
-    progress["level"] = max(1, progress.get("xp", 0) // 50 + 1)
-    unlock_achievements(progress)
-    return progress
-
-
-def register_user(name, username, password, invite_code):
-    users = load_users()
-    username = username.strip().lower()
-    if invite_code not in INVITE_CODES:
-        return False, "Código de invitación inválido."
-    if not name or not username or not password:
-        return False, "Completa todos los campos."
-    if username in users or username == ADMIN_USER:
-        return False, "Ese usuario ya existe."
-    if len(password) < 6:
-        return False, "La contraseña debe tener al menos 6 caracteres."
-    users[username] = {
-        "name": name.strip(),
-        "password": hash_pw(password),
-        "created_at": str(date.today()),
-        "progress": default_progress(name.strip()),
-    }
-    save_users(users)
-    return True, "Cuenta creada correctamente."
-
-
-def login_user(username, password):
-    username = username.strip().lower()
-    if username == ADMIN_USER and hash_pw(password) == ADMIN_PASS_HASH:
-        st.session_state["user"] = ADMIN_USER
-        st.session_state["admin"] = True
-        st.session_state["progress"] = default_progress("Administrador")
-        return True, "Acceso de administrador concedido."
-    users = load_users()
-    user = users.get(username)
-    if not user:
-        return False, "Ese usuario no existe."
-    if user.get("password") != hash_pw(password):
-        return False, "Contraseña incorrecta."
-    st.session_state["user"] = username
-    st.session_state["admin"] = False
-    st.session_state["progress"] = user.get("progress", default_progress(user.get("name", username)))
-    return True, "Bienvenido a FlickPy."
-
-
-def persist_progress():
-    if st.session_state.get("admin"):
-        return
-    username = st.session_state.get("user")
-    if not username:
-        return
-    users = load_users()
-    if username in users:
-        users[username]["progress"] = st.session_state.get("progress", default_progress())
-        save_users(users)
-
-
-def lesson_completed(progress, lesson_id):
-    return lesson_id in progress.get("completed_lessons", [])
-
-
-def next_lesson_id(progress):
-    for lesson in LESSONS:
-        if lesson["id"] not in progress.get("completed_lessons", []):
-            return lesson["id"]
-    return None
-
-
-def is_lesson_locked(progress, lesson_id):
-    nxt = next_lesson_id(progress)
-    if nxt is None:
-        return False
-    return lesson_id != nxt and lesson_id not in progress.get("completed_lessons", [])
-
 
 def auth_screen():
     if st.session_state.get("user"):
         return
     inject_css()
-    c1, c2 = st.columns([1, 2])
-    with c1:
-        render_logo(180)
-    with c2:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown(
+            "<div class='glass' style='display:flex;align-items:center;justify-content:center;height:220px;font-size:88px;'>🐍</div>",
+            unsafe_allow_html=True,
+        )
+    with col2:
+        st.markdown("<div class='glass'>", unsafe_allow_html=True)
         st.markdown("<div class='hero-title'>FlickPy</div>", unsafe_allow_html=True)
         st.markdown(
-            "<div class='hero-sub'>Aprende Python desde 0 con progreso real, XP, logros y una interfaz tipo Duolingo.</div>",
+            "<div class='hero-sub'>Aprende Python jugando con niveles, vidas, ranking y modo infinito.</div>",
             unsafe_allow_html=True,
         )
         st.markdown(
-            "<span class='mini-badge'>Invitación requerida</span>"
-            "<span class='mini-badge'>XP · Racha · Logros</span>"
-            "<span class='mini-badge'>Modo Admin</span>",
+            "<span class='pill'>42 niveles</span>"
+            "<span class='pill'>Ranking</span>"
+            "<span class='pill'>Modo infinito</span>",
             unsafe_allow_html=True,
         )
-        t1, t2 = st.tabs(["Iniciar sesión", "Crear cuenta"])
+        t1, t2 = st.tabs(["Entrar", "Crear cuenta"])
         with t1:
-            u = st.text_input("Usuario", key="login_u")
-            p = st.text_input("Contraseña", type="password", key="login_p")
+            u = st.text_input("Usuario", key="login_user")
+            p = st.text_input("Contraseña", type="password", key="login_pass")
             if st.button("Entrar", use_container_width=True):
-                ok, msg = login_user(u, p)
-                if ok:
-                    st.success(msg)
+                users = load_users()
+                user = users.get(u.strip().lower())
+                if user and user.get("password") == hash_pw(p):
+                    st.session_state["user"] = u.strip().lower()
+                    st.session_state["progress"] = user.get("progress", default_progress(u))
                     st.rerun()
                 else:
-                    st.error(msg)
+                    st.error("Usuario o contraseña incorrectos.")
         with t2:
-            n = st.text_input("Nombre visible", key="reg_n")
-            u2 = st.text_input("Usuario nuevo", key="reg_u")
-            p2 = st.text_input("Contraseña", type="password", key="reg_p")
+            name = st.text_input("Nombre visible", key="reg_name")
+            u2 = st.text_input("Usuario nuevo", key="reg_user")
+            p2 = st.text_input("Contraseña", type="password", key="reg_pass")
             code = st.text_input("Código de invitación", key="reg_code")
             if st.button("Crear cuenta", use_container_width=True):
-                ok, msg = register_user(n, u2, p2, code)
-                if ok:
-                    st.success(msg)
+                username = u2.strip().lower()
+                users = load_users()
+                if code not in INVITE_CODES:
+                    st.error("Código inválido.")
+                elif not username or not p2 or not name:
+                    st.error("Completa todos los campos.")
+                elif username in users:
+                    st.error("Ese usuario ya existe.")
                 else:
-                    st.error(msg)
+                    users[username] = {
+                        "password": hash_pw(p2),
+                        "progress": default_progress(name.strip()),
+                    }
+                    save_users(users)
+                    st.success("Cuenta creada. Ahora puedes entrar.")
         st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
+
 
 
 def render_header(progress):
     left, right = st.columns([5, 1])
     with left:
-        st.title(f"{APP_TITLE} · aprende Python jugando")
+        st.title(f"{APP_TITLE} · Python game mode")
+        st.caption(f"Sesión: {st.session_state.get('user')} · {progress.get('name', 'Estudiante')}")
     with right:
-        render_logo(84)
-        if st.session_state.get("admin"):
-            st.caption("Modo administrador")
-        st.caption(f"Sesión: {st.session_state.get('user', 'guest')}")
         if st.button("Cerrar sesión", use_container_width=True):
             st.session_state.clear()
             st.rerun()
-    a, b, c, d, e = st.columns(5)
-    a.metric("Nivel", progress.get("level", 1))
-    b.metric("XP", progress.get("xp", 0))
-    c.metric("Racha", progress.get("streak", 0))
-    d.metric("Gemas", progress.get("gems", 0))
-    e.metric("Corazones", progress.get("hearts", 5))
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("Nivel", progress.get("level", 1))
+    c2.metric("XP", progress.get("xp", 0))
+    c3.metric("❤️ Vidas", progress.get("hearts", 5))
+    c4.metric("💎 Gemas", progress.get("gems", 0))
+    c5.metric("🔥 Racha", progress.get("streak", 0))
 
 
-def render_learning_path(progress):
-    st.markdown("### Ruta visual")
-    cols = st.columns(len(LESSONS))
+
+def render_path(progress):
+    st.markdown("### Ruta principal")
+    preview = LESSONS[:8]
+    cols = st.columns(len(preview))
     nxt = next_lesson_id(progress)
-    for i, lesson in enumerate(LESSONS):
+    for idx, lesson in enumerate(preview):
         done = lesson_completed(progress, lesson["id"])
-        is_next = lesson["id"] == nxt
-        locked = not done and not is_next and nxt is not None
+        locked = not done and lesson["id"] != nxt and nxt is not None
         node_class = "path-node locked" if locked else "path-node"
-        label = "✅" if done else ("▶️" if is_next else "🔒")
-        with cols[i]:
+        label = "✅" if done else ("▶️" if lesson["id"] == nxt else "🔒")
+        with cols[idx]:
             st.markdown(
                 f"""
                 <div class='{node_class}'>{lesson['icon']}</div>
-                <div class='centered-small'><strong>{lesson['title']}</strong></div>
-                <div class='centered-small'>{label} · {lesson['xp']} XP</div>
+                <div class='center-small'><strong>{lesson['title']}</strong></div>
+                <div class='center-small'>{label}</div>
                 """,
                 unsafe_allow_html=True,
             )
 
 
+
 def render_home(progress):
     st.subheader(f"Hola, {progress.get('name', 'Estudiante')} 👋")
     total = len(LESSONS)
-    done = len(progress.get("completed_lessons", []))
+    done = len(progress.get("completed", []))
     nxt = next_lesson_id(progress)
-    st.progress(done / total if total else 0, text=f"Ruta completada: {done}/{total}")
-    st.write("Completa misiones, sube de nivel y desbloquea nuevos temas de Python.")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown("<div class='card'><h4 style='color:white;'>Siguiente misión</h4><p style='color:#c7d7ef;'>Sigue tu ruta principal y gana XP, gemas y logros.</p></div>", unsafe_allow_html=True)
-    with c2:
-        st.markdown("<div class='card'><h4 style='color:white;'>Vidas</h4><p style='color:#c7d7ef;'>Cada error puede costarte una vida. Entrena con cuidado.</p></div>", unsafe_allow_html=True)
-    with c3:
-        st.markdown("<div class='card'><h4 style='color:white;'>Recompensas</h4><p style='color:#c7d7ef;'>Usa tus gemas para recuperar vidas en la tienda.</p></div>", unsafe_allow_html=True)
+    st.progress(done / total if total else 0, text=f"Ruta completada: {done}/{total} niveles")
+
+    a, b, c = st.columns(3)
+    with a:
+        st.markdown("<div class='glass'><h4 style='color:white;'>Siguiente misión</h4><p style='color:#c7d7ef;'>Continúa tu ruta y desbloquea nuevos temas.</p></div>", unsafe_allow_html=True)
+    with b:
+        st.markdown("<div class='glass'><h4 style='color:white;'>Modo infinito</h4><p style='color:#c7d7ef;'>Suma XP extra con retos sin límite.</p></div>", unsafe_allow_html=True)
+    with c:
+        st.markdown("<div class='glass'><h4 style='color:white;'>Ranking</h4><p style='color:#c7d7ef;'>Compite con tus amigos por el top 1.</p></div>", unsafe_allow_html=True)
+
     if nxt:
         lesson = next(l for l in LESSONS if l["id"] == nxt)
-        st.markdown("### Continúa tu ruta")
-        st.info(f"Tu siguiente lección es: {lesson['icon']} {lesson['title']} · {lesson['xp']} XP")
+        st.info(f"Tu siguiente nivel es: {lesson['icon']} {lesson['title']} · {lesson['xp']} XP")
         if st.button("▶️ Continuar aprendizaje", type="primary", use_container_width=True):
             st.session_state["selected_lesson_id"] = nxt
             st.session_state["go_to_lessons"] = True
             st.rerun()
     else:
-        st.success("🎉 Terminaste toda la ruta actual")
-        st.write("Ahora se desbloqueó el modo infinito para seguir practicando sin límite.")
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("♾️ Ir al modo infinito", type="primary", use_container_width=True):
-                st.session_state["go_to_infinite"] = True
-                st.rerun()
-        with c2:
-            st.info("Sigue ganando XP, gemas y racha con desafíos aleatorios.")
-    render_learning_path(progress)
-    st.markdown("### Unidades")
-    cols = st.columns(min(3, len(LESSONS)))
+        st.success("🎉 Ya terminaste toda la ruta base. Ahora manda en el modo infinito.")
+
+    render_path(progress)
+
+    st.markdown("### Catálogo de niveles")
+    cols = st.columns(3)
     for idx, lesson in enumerate(LESSONS):
-        with cols[idx % len(cols)]:
-            done = lesson_completed(progress, lesson["id"])
-            locked = is_lesson_locked(progress, lesson["id"])
-            status = "Completada ✅" if done else ("Bloqueada 🔒" if locked else "Disponible 🟡")
+        done = lesson_completed(progress, lesson["id"])
+        locked = is_lesson_locked(progress, lesson["id"])
+        status = "Completada ✅" if done else ("Bloqueada 🔒" if locked else "Disponible 🟡")
+        with cols[idx % 3]:
             st.markdown(
                 f"""
-                <div class='lesson-tile'>
+                <div class='lesson-card'>
                     <div class='lesson-icon'>{lesson['icon']}</div>
-                    <div class='lesson-name'>{lesson['title']}</div>
+                    <div class='lesson-title'>{lesson['title']}</div>
                     <div class='lesson-meta'>{lesson['difficulty']} · {lesson['xp']} XP</div>
                     <div class='lesson-meta'>{status}</div>
                 </div>
@@ -575,82 +640,76 @@ def render_home(progress):
             )
 
 
+
 def render_lessons(progress):
-    st.subheader("Ruta de aprendizaje")
-    lesson_map = {f"{l['icon']} {l['title']} · {l['difficulty']}": l for l in LESSONS}
-    labels = list(lesson_map.keys())
+    st.subheader("Lecciones")
+    labels = [f"{l['icon']} {l['title']} · {l['difficulty']}" for l in LESSONS]
     default_index = 0
-    selected_lesson_id = st.session_state.get("selected_lesson_id")
-    if selected_lesson_id:
+    selected_id = st.session_state.get("selected_lesson_id")
+    if selected_id:
         for i, lesson in enumerate(LESSONS):
-            if lesson["id"] == selected_lesson_id:
+            if lesson["id"] == selected_id:
                 default_index = i
                 break
     selected = st.selectbox("Elige una lección", labels, index=default_index)
-    lesson = lesson_map[selected]
+    lesson = next(l for l in LESSONS if f"{l['icon']} {l['title']} · {l['difficulty']}" == selected)
+
     if is_lesson_locked(progress, lesson["id"]):
-        nxt = next_lesson_id(progress)
-        next_title = next((l["title"] for l in LESSONS if l["id"] == nxt), "la siguiente")
-        st.warning(f"Esta lección está bloqueada. Primero debes completar: {next_title}.")
+        st.warning("Esa lección está bloqueada. Completa la ruta en orden.")
         return
+
     lesson_key = f"lesson_state_{lesson['id']}"
-    transition_key = f"transition_msg_{lesson['id']}"
+    transition_key = f"transition_{lesson['id']}"
     if lesson_key not in st.session_state:
-        st.session_state[lesson_key] = {
-            "index": 0,
-            "correct": 0,
-            "finished": False,
-            "awarded": False,
-        }
+        st.session_state[lesson_key] = {"index": 0, "correct": 0, "finished": False, "awarded": False}
     state = st.session_state[lesson_key]
+
     with st.container(border=True):
         st.markdown(f"## {lesson['icon']} {lesson['title']}")
-        st.caption(f"Dificultad: {lesson['difficulty']} · Recompensa: {lesson['xp']} XP")
+        st.caption(f"{lesson['difficulty']} · {lesson['xp']} XP")
         st.write(lesson["theory"])
+
     total_q = len(lesson["questions"])
+
     if state["finished"]:
         st.success(f"Lección terminada. Aciertos: {state['correct']}/{total_q}")
         if state["correct"] == total_q:
-            if lesson["id"] not in progress["completed_lessons"] and not state["awarded"]:
-                progress["completed_lessons"].append(lesson["id"])
+            if lesson["id"] not in progress["completed"] and not state["awarded"]:
+                progress["completed"].append(lesson["id"])
                 progress["xp"] += lesson["xp"]
-                progress["gems"] += 5
-                progress["history"].append({"title": lesson["title"], "date": str(date.today()), "xp": lesson["xp"]})
+                progress["gems"] += 4
+                progress["history"].append({"title": lesson["title"], "xp": lesson["xp"], "date": str(date.today())})
                 update_meta(progress)
                 st.session_state["progress"] = progress
-                persist_progress()
                 state["awarded"] = True
                 st.session_state[lesson_key] = state
-                st.session_state["selected_lesson_id"] = next_lesson_id(progress)
+                persist_current_user()
                 st.balloons()
-                st.success("Perfecto. Completaste la lección y ganaste recompensas.")
-            elif lesson["id"] in progress["completed_lessons"]:
-                st.info("Ya habías completado esta lección.")
+                st.success("Perfecto. Lección completada y recompensas entregadas.")
+                st.session_state["selected_lesson_id"] = next_lesson_id(progress)
         else:
-            st.warning("No lograste un perfecto. Puedes reintentar la lección para completarla.")
+            st.warning("No fue perfecta. Reintenta para completar el nivel.")
+
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("Reintentar lección", use_container_width=True):
-                st.session_state[lesson_key] = {
-                    "index": 0,
-                    "correct": 0,
-                    "finished": False,
-                    "awarded": False,
-                }
+            if st.button("Reintentar", use_container_width=True):
+                st.session_state[lesson_key] = {"index": 0, "correct": 0, "finished": False, "awarded": False}
                 st.session_state[transition_key] = ""
                 st.rerun()
         with c2:
-            if lesson["id"] in progress.get("completed_lessons", []):
-                st.success("✅ Lección completada")
+            if lesson_completed(progress, lesson["id"]):
+                st.success("✅ Nivel completado")
             else:
-                st.info("💡 Debes acertar todas para completarla")
+                st.info("💡 Debes acertar todo")
         return
+
     q_index = state["index"]
     q = lesson["questions"][q_index]
     st.progress((q_index + 1) / total_q, text=f"Pregunta {q_index + 1} de {total_q}")
     if st.session_state.get(transition_key):
         st.markdown(f"<div class='transition-chip'>{st.session_state[transition_key]}</div>", unsafe_allow_html=True)
         st.session_state[transition_key] = ""
+
     st.markdown("<div class='question-card'>", unsafe_allow_html=True)
     st.markdown(f"<div class='question-title'>{q['prompt']}</div>", unsafe_allow_html=True)
     answer_key = f"answer_{lesson['id']}_{q_index}"
@@ -659,6 +718,7 @@ def render_lessons(progress):
     else:
         st.code(q["starter"], language="python")
         ans = st.text_input("Completa", key=answer_key)
+
     if st.button("Comprobar", type="primary", use_container_width=True, key=f"check_{lesson['id']}_{q_index}"):
         if ans is None or str(ans).strip() == "":
             st.warning("Debes responder antes de continuar.")
@@ -670,8 +730,8 @@ def render_lessons(progress):
             else:
                 progress["hearts"] = max(0, progress.get("hearts", 5) - 1)
                 st.session_state["progress"] = progress
-                persist_progress()
-                st.session_state[transition_key] = "⚡ Siguiente reto..."
+                st.session_state[transition_key] = f"❌ Incorrecto. Quedan {progress['hearts']} vidas"
+                persist_current_user()
             state["index"] += 1
             if state["index"] >= total_q:
                 state["finished"] = True
@@ -680,76 +740,63 @@ def render_lessons(progress):
     st.markdown("</div>", unsafe_allow_html=True)
 
 
+
 def render_practice(progress):
     st.subheader("Práctica rápida")
-    if progress.get("hearts", 5) <= 0:
-        st.error("No tienes vidas disponibles. Usa gemas en la tienda para recuperar una.")
+    if progress.get("hearts", 0) <= 0:
+        st.error("No tienes vidas. Compra más en la tienda.")
         return
     lesson = random.choice(LESSONS)
     q = random.choice(lesson["questions"])
     st.caption(f"Tema: {lesson['title']}")
-    st.write(q["prompt"])
     if q["type"] == "mc":
-        ans = st.radio("Tu respuesta", q["options"], index=None)
+        ans = st.radio(q["prompt"], q["options"], index=None)
     else:
+        st.write(q["prompt"])
         st.code(q["starter"], language="python")
-        ans = st.text_input("Completa")
+        ans = st.text_input("Respuesta práctica")
     if st.button("Comprobar práctica", use_container_width=True):
         if ans is None or str(ans).strip() == "":
             st.warning("Debes responder antes de continuar.")
             return
-        ok = str(ans).strip() == str(q["answer"]).strip()
-        if ok:
-            progress["xp"] += 5
+        if str(ans).strip() == str(q["answer"]).strip():
+            progress["xp"] += 6
             progress["gems"] += 1
-            progress["history"].append({"title": f"Práctica · {lesson['title']}", "date": str(date.today()), "xp": 5})
+            progress["history"].append({"title": f"Práctica · {lesson['title']}", "xp": 6, "date": str(date.today())})
             update_meta(progress)
             st.session_state["progress"] = progress
-            persist_progress()
-            st.success("Correcto. +5 XP y +1 gema")
+            persist_current_user()
+            st.success("Correcto. +6 XP y +1 gema")
         else:
             progress["hearts"] = max(0, progress.get("hearts", 5) - 1)
             st.session_state["progress"] = progress
-            persist_progress()
-            st.error(f"Incorrecto. Respuesta esperada: {q['answer']}")
-            if progress["hearts"] <= 0:
-                st.warning("Te quedaste sin vidas 💔")
-            else:
-                st.warning(f"Perdiste 1 vida. Te quedan {progress['hearts']}.")
+            persist_current_user()
+            st.error(f"Incorrecto. Respuesta: {q['answer']}")
+
 
 
 def render_infinite(progress):
     st.subheader("Modo infinito ♾️")
-    st.write("Desafíos aleatorios sin fin para seguir subiendo XP.")
-
-    if progress.get("hearts", 5) <= 0:
-        st.error("No tienes vidas disponibles. Ve a la tienda para recuperar corazones.")
+    st.write("Retos aleatorios para seguir sumando XP sin límite.")
+    if progress.get("hearts", 0) <= 0:
+        st.error("No tienes vidas. Recupera corazones en la tienda.")
         return
-
-    if "infinite_best_streak" not in progress:
-        progress["infinite_best_streak"] = 0
-    if "infinite_current_streak" not in progress:
-        progress["infinite_current_streak"] = 0
-
     if "infinite_question" not in st.session_state:
         lesson = random.choice(LESSONS)
-        question = random.choice(lesson["questions"])
-        st.session_state["infinite_question"] = {"lesson": lesson, "question": question}
-
+        st.session_state["infinite_question"] = {"lesson": lesson, "question": random.choice(lesson["questions"])}
     payload = st.session_state["infinite_question"]
     lesson = payload["lesson"]
     q = payload["question"]
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Racha infinita", progress.get("infinite_current_streak", 0))
-    c2.metric("Mejor racha", progress.get("infinite_best_streak", 0))
-    c3.metric("Recompensa", "+8 XP")
+    a, b, c = st.columns(3)
+    a.metric("Racha infinita", progress.get("infinite_streak", 0))
+    b.metric("Mejor racha", progress.get("best_infinite_streak", 0))
+    c.metric("Recompensa", "+8 XP")
 
-    st.caption(f"Tema: {lesson['title']}")
     st.markdown("<div class='question-card'>", unsafe_allow_html=True)
     st.markdown(f"<div class='question-title'>{q['prompt']}</div>", unsafe_allow_html=True)
-
-    inf_key = f"infinite_answer_{lesson['id']}_{q['prompt']}"
+    st.caption(f"Tema: {lesson['title']}")
+    inf_key = f"infinite_{lesson['id']}_{q['prompt']}"
     if q["type"] == "mc":
         ans = st.radio("Selecciona una opción", q["options"], index=None, key=inf_key)
     else:
@@ -760,43 +807,31 @@ def render_infinite(progress):
         if ans is None or str(ans).strip() == "":
             st.warning("Debes responder antes de continuar.")
         else:
-            ok = str(ans).strip() == str(q["answer"]).strip()
-            if ok:
+            if str(ans).strip() == str(q["answer"]).strip():
                 progress["xp"] += 8
                 progress["gems"] += 2
-                progress["infinite_current_streak"] = progress.get("infinite_current_streak", 0) + 1
-                progress["infinite_best_streak"] = max(
-                    progress.get("infinite_best_streak", 0),
-                    progress["infinite_current_streak"],
-                )
-                progress["history"].append({"title": f"Modo infinito · {lesson['title']}", "date": str(date.today()), "xp": 8})
+                progress["infinite_streak"] = progress.get("infinite_streak", 0) + 1
+                progress["best_infinite_streak"] = max(progress.get("best_infinite_streak", 0), progress["infinite_streak"])
+                progress["history"].append({"title": f"Infinito · {lesson['title']}", "xp": 8, "date": str(date.today())})
                 update_meta(progress)
                 st.session_state["progress"] = progress
-                persist_progress()
+                persist_current_user()
                 st.success("Correcto. +8 XP y +2 gemas")
             else:
                 progress["hearts"] = max(0, progress.get("hearts", 5) - 1)
-                progress["infinite_current_streak"] = 0
+                progress["infinite_streak"] = 0
                 st.session_state["progress"] = progress
-                persist_progress()
-                st.error(f"Incorrecto. Respuesta: {q['answer']}. {q['explanation']}")
-                if progress["hearts"] <= 0:
-                    st.warning("Te quedaste sin vidas 💔")
-                else:
-                    st.warning(f"Perdiste 1 vida. Te quedan {progress['hearts']}.")
-
+                persist_current_user()
+                st.error(f"Incorrecto. Respuesta: {q['answer']}")
             lesson = random.choice(LESSONS)
-            question = random.choice(lesson["questions"])
-            st.session_state["infinite_question"] = {"lesson": lesson, "question": question}
+            st.session_state["infinite_question"] = {"lesson": lesson, "question": random.choice(lesson["questions"])}
             st.rerun()
-
     st.markdown("</div>", unsafe_allow_html=True)
 
 
 
 def render_shop(progress):
     st.subheader("Tienda")
-    st.write("Canjea gemas por vidas para seguir aprendiendo.")
     c1, c2 = st.columns(2)
     with c1:
         with st.container(border=True):
@@ -807,10 +842,10 @@ def render_shop(progress):
                     progress["gems"] -= 10
                     progress["hearts"] += 1
                     st.session_state["progress"] = progress
-                    persist_progress()
-                    st.success("Compraste 1 vida.")
+                    persist_current_user()
+                    st.success("Compraste 1 vida")
                 else:
-                    st.error("No tienes suficientes gemas.")
+                    st.error("No tienes suficientes gemas")
     with c2:
         with st.container(border=True):
             st.markdown("### ❤️❤️ pack x3")
@@ -820,33 +855,53 @@ def render_shop(progress):
                     progress["gems"] -= 25
                     progress["hearts"] += 3
                     st.session_state["progress"] = progress
-                    persist_progress()
-                    st.success("Compraste 3 vidas.")
+                    persist_current_user()
+                    st.success("Compraste 3 vidas")
                 else:
-                    st.error("No tienes suficientes gemas.")
+                    st.error("No tienes suficientes gemas")
+
 
 
 def render_achievements(progress):
     st.subheader("Logros")
     unlocked = set(progress.get("achievements", []))
-    cols = st.columns(2)
-    for idx, (aid, name, _) in enumerate(ACHIEVEMENTS):
-        with cols[idx % 2]:
-            with st.container(border=True):
-                st.markdown(f"### {'🏆' if aid in unlocked else '🔒'} {name}")
-                st.caption("Desbloqueado" if aid in unlocked else "Bloqueado")
+    for aid, name, _ in ACHIEVEMENTS:
+        with st.container(border=True):
+            st.markdown(f"### {'🏆' if aid in unlocked else '🔒'} {name}")
+            st.caption("Desbloqueado" if aid in unlocked else "Bloqueado")
+
+
+
+def render_leaderboard(progress):
+    st.subheader("Ranking online")
+    st.caption("Este ranking se comparte entre usuarios de la misma app desplegada.")
+    leaderboard = get_leaderboard()
+    if not leaderboard:
+        st.info("Aún no hay usuarios en el ranking.")
+        return
+    for idx, row in enumerate(leaderboard[:15], start=1):
+        badge = "🥇" if idx == 1 else ("🥈" if idx == 2 else ("🥉" if idx == 3 else f"#{idx}"))
+        me = row["username"] == st.session_state.get("user")
+        with st.container(border=True):
+            st.markdown(f"**{badge} {row['name']}** {'← tú' if me else ''}")
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("XP", row["xp"])
+            c2.metric("Nivel", row["level"])
+            c3.metric("Lecciones", row["completed"])
+            c4.metric("Racha", row["streak"])
+
 
 
 def render_stats(progress):
-    st.subheader("Tus estadísticas")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Lecciones", len(progress.get("completed_lessons", [])))
-    c2.metric("Historial", len(progress.get("history", [])))
-    c3.metric("XP total", progress.get("xp", 0))
+    st.subheader("Estadísticas")
+    a, b, c = st.columns(3)
+    a.metric("Lecciones completadas", len(progress.get("completed", [])))
+    b.metric("XP total", progress.get("xp", 0))
+    c.metric("Mejor racha infinita", progress.get("best_infinite_streak", 0))
     st.markdown("### Actividad reciente")
     history = progress.get("history", [])
     if not history:
-        st.info("Aún no hay actividad.")
+        st.info("Aún no hay actividad")
     else:
         for item in reversed(history[-10:]):
             with st.container(border=True):
@@ -854,77 +909,29 @@ def render_stats(progress):
                 st.caption(f"{item['date']} · +{item['xp']} XP")
 
 
-def render_editor():
-    st.subheader("Editor rápido")
-    st.code(
-        """LESSONS = [{
-    'id': 'nuevo_tema',
-    'title': 'Nuevo tema',
-    'icon': '🧠',
-    'xp': 20,
-    'difficulty': 'Fácil',
-    'theory': 'Explicación breve...',
-    'questions': []
-}]
-
-INVITE_CODES = ['FLICK2026', 'NUEVOCODIGO']
-""",
-        language="python",
-    )
-
-
-def render_admin():
-    st.subheader("Panel de administración")
-    users = load_users()
-    total_users = len(users)
-    total_xp = sum(v.get("progress", {}).get("xp", 0) for v in users.values())
-    total_done = sum(len(v.get("progress", {}).get("completed_lessons", [])) for v in users.values())
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Usuarios", total_users)
-    c2.metric("XP total", total_xp)
-    c3.metric("Lecciones completadas", total_done)
-    if not users:
-        st.info("Todavía no hay usuarios registrados.")
-        return
-    for username, data in users.items():
-        progress = data.get("progress", default_progress(data.get("name", username)))
-        with st.container(border=True):
-            st.markdown(f"**{data.get('name', username)}** · @{username}")
-            a, b, c, d = st.columns(4)
-            a.metric("Nivel", progress.get("level", 1))
-            b.metric("XP", progress.get("xp", 0))
-            c.metric("Racha", progress.get("streak", 0))
-            d.metric("Lecciones", len(progress.get("completed_lessons", [])))
-
 
 def main():
     st.set_page_config(page_title=APP_TITLE, page_icon="🐍", layout="wide")
     if "user" not in st.session_state:
         st.session_state["user"] = None
-    if "admin" not in st.session_state:
-        st.session_state["admin"] = False
     if "progress" not in st.session_state:
         st.session_state["progress"] = default_progress()
+
     auth_screen()
     inject_css()
+
     progress = st.session_state.get("progress", default_progress())
-    if not st.session_state.get("admin"):
-        progress = update_meta(progress)
-        st.session_state["progress"] = progress
-        persist_progress()
+    progress = update_meta(progress)
+    st.session_state["progress"] = progress
+    persist_current_user()
+
     render_header(progress)
-    if st.session_state.get("admin"):
-        render_admin()
-        st.markdown("### Compartir con tu clase")
-        st.code("python -m streamlit run flickpy_duolingo_style_app.py", language="bash")
-        return
-    tabs = st.tabs(["Inicio", "Lecciones", "Práctica", "Infinito", "Tienda", "Logros", "Estadísticas", "Editor"])
+
+    tabs = st.tabs(["Inicio", "Lecciones", "Práctica", "Infinito", "Tienda", "Ranking", "Logros", "Stats"])
     if st.session_state.get("go_to_lessons"):
         st.session_state["go_to_lessons"] = False
         st.info("Abre la pestaña 'Lecciones' para continuar tu ruta.")
-    if st.session_state.get("go_to_infinite"):
-        st.session_state["go_to_infinite"] = False
-        st.info("Abre la pestaña 'Infinito' para seguir jugando sin límite.")
+
     with tabs[0]:
         render_home(progress)
     with tabs[1]:
@@ -936,11 +943,11 @@ def main():
     with tabs[4]:
         render_shop(progress)
     with tabs[5]:
-        render_achievements(progress)
+        render_leaderboard(progress)
     with tabs[6]:
-        render_stats(progress)
+        render_achievements(progress)
     with tabs[7]:
-        render_editor()
+        render_stats(progress)
 
 
 if __name__ == "__main__":
