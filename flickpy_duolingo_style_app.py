@@ -54,7 +54,10 @@ LESSONS = [
             {
                 "type": "fill",
                 "prompt": "Completa la palabra clave",
-                "starter": "if x > 5:\n    print('ok')\n_____: \n    print('no')",
+                "starter": "if x > 5:
+    print('ok')
+_____: 
+    print('no')",
                 "answer": "else",
                 "explanation": "La opción correcta es else.",
             },
@@ -78,7 +81,8 @@ LESSONS = [
             {
                 "type": "fill",
                 "prompt": "Completa la función",
-                "starter": "for i in _____(5):\n    print(i)",
+                "starter": "for i in _____(5):
+    print(i)",
                 "answer": "range",
                 "explanation": "range(5) repite 5 veces: 0,1,2,3,4.",
             },
@@ -102,7 +106,8 @@ LESSONS = [
             {
                 "type": "fill",
                 "prompt": "Completa la palabra clave",
-                "starter": "def sumar(a, b):\n    _____ a + b",
+                "starter": "def sumar(a, b):
+    _____ a + b",
                 "answer": "return",
                 "explanation": "return devuelve el resultado.",
             },
@@ -126,7 +131,8 @@ LESSONS = [
             {
                 "type": "fill",
                 "prompt": "Completa el método",
-                "starter": "numeros = [1, 2]\nnumeros._____(3)",
+                "starter": "numeros = [1, 2]
+numeros._____(3)",
                 "answer": "append",
                 "explanation": "append agrega un elemento al final de la lista.",
             },
@@ -539,7 +545,15 @@ def render_home(progress):
             st.session_state["go_to_lessons"] = True
             st.rerun()
     else:
-        st.success("Terminaste toda la ruta actual. Ya puedes repetir lecciones o agregar nuevas unidades.")
+        st.success("🎉 Terminaste toda la ruta actual")
+        st.write("Ahora se desbloqueó el modo infinito para seguir practicando sin límite.")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("♾️ Ir al modo infinito", type="primary", use_container_width=True):
+                st.session_state["go_to_infinite"] = True
+                st.rerun()
+        with c2:
+            st.info("Sigue ganando XP, gemas y racha con desafíos aleatorios.")
     render_learning_path(progress)
     st.markdown("### Unidades")
     cols = st.columns(min(3, len(LESSONS)))
@@ -704,6 +718,82 @@ def render_practice(progress):
                 st.warning(f"Perdiste 1 vida. Te quedan {progress['hearts']}.")
 
 
+def render_infinite(progress):
+    st.subheader("Modo infinito ♾️")
+    st.write("Desafíos aleatorios sin fin para seguir subiendo XP.")
+
+    if progress.get("hearts", 5) <= 0:
+        st.error("No tienes vidas disponibles. Ve a la tienda para recuperar corazones.")
+        return
+
+    if "infinite_best_streak" not in progress:
+        progress["infinite_best_streak"] = 0
+    if "infinite_current_streak" not in progress:
+        progress["infinite_current_streak"] = 0
+
+    if "infinite_question" not in st.session_state:
+        lesson = random.choice(LESSONS)
+        question = random.choice(lesson["questions"])
+        st.session_state["infinite_question"] = {"lesson": lesson, "question": question}
+
+    payload = st.session_state["infinite_question"]
+    lesson = payload["lesson"]
+    q = payload["question"]
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Racha infinita", progress.get("infinite_current_streak", 0))
+    c2.metric("Mejor racha", progress.get("infinite_best_streak", 0))
+    c3.metric("Recompensa", "+8 XP")
+
+    st.caption(f"Tema: {lesson['title']}")
+    st.markdown("<div class='question-card'>", unsafe_allow_html=True)
+    st.markdown(f"<div class='question-title'>{q['prompt']}</div>", unsafe_allow_html=True)
+
+    inf_key = f"infinite_answer_{lesson['id']}_{q['prompt']}"
+    if q["type"] == "mc":
+        ans = st.radio("Selecciona una opción", q["options"], index=None, key=inf_key)
+    else:
+        st.code(q["starter"], language="python")
+        ans = st.text_input("Completa", key=inf_key)
+
+    if st.button("Responder reto infinito", type="primary", use_container_width=True):
+        if ans is None or str(ans).strip() == "":
+            st.warning("Debes responder antes de continuar.")
+        else:
+            ok = str(ans).strip() == str(q["answer"]).strip()
+            if ok:
+                progress["xp"] += 8
+                progress["gems"] += 2
+                progress["infinite_current_streak"] = progress.get("infinite_current_streak", 0) + 1
+                progress["infinite_best_streak"] = max(
+                    progress.get("infinite_best_streak", 0),
+                    progress["infinite_current_streak"],
+                )
+                progress["history"].append({"title": f"Modo infinito · {lesson['title']}", "date": str(date.today()), "xp": 8})
+                update_meta(progress)
+                st.session_state["progress"] = progress
+                persist_progress()
+                st.success("Correcto. +8 XP y +2 gemas")
+            else:
+                progress["hearts"] = max(0, progress.get("hearts", 5) - 1)
+                progress["infinite_current_streak"] = 0
+                st.session_state["progress"] = progress
+                persist_progress()
+                st.error(f"Incorrecto. Respuesta: {q['answer']}. {q['explanation']}")
+                if progress["hearts"] <= 0:
+                    st.warning("Te quedaste sin vidas 💔")
+                else:
+                    st.warning(f"Perdiste 1 vida. Te quedan {progress['hearts']}.")
+
+            lesson = random.choice(LESSONS)
+            question = random.choice(lesson["questions"])
+            st.session_state["infinite_question"] = {"lesson": lesson, "question": question}
+            st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+
 def render_shop(progress):
     st.subheader("Tienda")
     st.write("Canjea gemas por vidas para seguir aprendiendo.")
@@ -828,10 +918,13 @@ def main():
         st.markdown("### Compartir con tu clase")
         st.code("python -m streamlit run flickpy_duolingo_style_app.py", language="bash")
         return
-    tabs = st.tabs(["Inicio", "Lecciones", "Práctica", "Tienda", "Logros", "Estadísticas", "Editor"])
+    tabs = st.tabs(["Inicio", "Lecciones", "Práctica", "Infinito", "Tienda", "Logros", "Estadísticas", "Editor"])
     if st.session_state.get("go_to_lessons"):
         st.session_state["go_to_lessons"] = False
         st.info("Abre la pestaña 'Lecciones' para continuar tu ruta.")
+    if st.session_state.get("go_to_infinite"):
+        st.session_state["go_to_infinite"] = False
+        st.info("Abre la pestaña 'Infinito' para seguir jugando sin límite.")
     with tabs[0]:
         render_home(progress)
     with tabs[1]:
@@ -839,12 +932,14 @@ def main():
     with tabs[2]:
         render_practice(progress)
     with tabs[3]:
-        render_shop(progress)
+        render_infinite(progress)
     with tabs[4]:
-        render_achievements(progress)
+        render_shop(progress)
     with tabs[5]:
-        render_stats(progress)
+        render_achievements(progress)
     with tabs[6]:
+        render_stats(progress)
+    with tabs[7]:
         render_editor()
 
 
